@@ -16,11 +16,124 @@ def test_chop():
     regions1 = [Region('chrA', 1, 5), Region('chrA', 8, 10),
                 Region('chrB', 5, 15)]
     rs1 = RegionSet(deepcopy(regions1))
-    rs1.chop(Region('chrA', 1, 5))
-    assert len(rs1.chrom2itree['chrA']) == 1
-    assert len(rs1.chrom2itree['chrB']) == 1
-    rs1.chop(Region('chrB', 5, 15))
-    assert len(rs1.chrom2itree['chrB']) == 0
+    genotype = (True, True)
+    rs1.chop(Region('chrA', 1, 5), genotype)
+    assert len(rs1.chrom2itree['chrA'][0]) == 1
+    assert len(rs1.chrom2itree['chrB'][0]) == 1
+    rs1.chop(Region('chrB', 5, 15), genotype)
+    assert len(rs1.chrom2itree['chrB'][0]) == 0
+
+import pytest
+from insilicosv.utils import Region, RegionSet
+
+def make_regions(chrom, intervals):
+    """Helper: intervals = [(start, end), ...]"""
+    return [Region(chrom=chrom, start=s, end=e) for s, e in intervals]
+
+def test_chop_simple_overlap_hap0():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=120, end=180)
+    genotype = (True, False)
+    rset.chop(sv_region, genotype)
+    result_hap0 = sorted((r.start, r.end) for r in rset.get_region_list(hap=0))
+    result_hap1 = sorted((r.start, r.end) for r in rset.get_region_list(hap=1))
+    assert result_hap0 == [(100, 120), (180, 200)]
+    assert result_hap1 == [(100, 200)]  # unchanged
+
+def test_chop_simple_overlap_hap1():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=120, end=180)
+    genotype = (False, True)
+    rset.chop(sv_region, genotype)
+    result_hap0 = sorted((r.start, r.end) for r in rset.get_region_list(hap=0))
+    result_hap1 = sorted((r.start, r.end) for r in rset.get_region_list(hap=1))
+    assert result_hap0 == [(100, 200)]  # unchanged
+    assert result_hap1 == [(100, 120), (180, 200)]
+
+def test_chop_simple_overlap_both_haps():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=120, end=180)
+    genotype = (True, True)
+    rset.chop(sv_region, genotype)
+    result_hap0 = sorted((r.start, r.end) for r in rset.get_region_list(hap=0))
+    result_hap1 = sorted((r.start, r.end) for r in rset.get_region_list(hap=1))
+    assert result_hap0 == [(100, 120), (180, 200)]
+    assert result_hap1 == [(100, 120), (180, 200)]
+
+def test_chop_no_overlap_any_hap():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=200, end=300)
+    genotype = (True, True)
+    rset.chop(sv_region, genotype)
+    result_hap0 = sorted((r.start, r.end) for r in rset.get_region_list(hap=0))
+    result_hap1 = sorted((r.start, r.end) for r in rset.get_region_list(hap=1))
+    assert result_hap0 == [(100, 200)]
+    assert result_hap1 == [(100, 200)]
+
+def test_chop_full_overlap_removal_hap0():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=100, end=200)
+    genotype = (True, False)
+    rset.chop(sv_region, genotype)
+    result_hap0 = sorted((r.start, r.end) for r in rset.get_region_list(hap=0))
+    result_hap1 = sorted((r.start, r.end) for r in rset.get_region_list(hap=1))
+    assert result_hap0 == []  # region fully removed
+    assert result_hap1 == [(100, 200)]  # untouched
+
+def test_chop_partial_left_edge_hap1():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=100, end=150)
+    genotype = (False, True)
+    rset.chop(sv_region, genotype)
+    result_hap0 = sorted((r.start, r.end) for r in rset.get_region_list(hap=0))
+    result_hap1 = sorted((r.start, r.end) for r in rset.get_region_list(hap=1))
+    assert result_hap0 == [(100, 200)]
+    assert result_hap1 == [(150, 200)]
+
+def test_chop_partial_right_edge_both_haps():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=150, end=200)
+    genotype = (True, True)
+    rset.chop(sv_region, genotype)
+    result_hap0 = sorted((r.start, r.end) for r in rset.get_region_list(hap=0))
+    result_hap1 = sorted((r.start, r.end) for r in rset.get_region_list(hap=1))
+    assert result_hap0 == [(100, 150)]
+    assert result_hap1 == [(100, 150)]
+
+def test_chop_multiple_regions_hap1():
+    regions = make_regions("chr1", [(100, 120), (130, 150), (160, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=135, end=170)
+    genotype = (False, True)
+    rset.chop(sv_region, genotype)
+    # Only hap1 affected
+    assert sorted((r.start, r.end) for r in rset.get_region_list(hap=0)) == [(100, 120), (130, 150), (160, 200)]
+    assert sorted((r.start, r.end) for r in rset.get_region_list(hap=1)) == [(100, 120), (130, 135), (170, 200)]
+
+def test_chop_other_chrom():
+    regions = make_regions("chr2", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=120, end=180)
+    genotype = (True, True)
+    rset.chop(sv_region, genotype)
+    assert sorted((r.start, r.end) for r in rset.get_region_list(hap=0)) == [(100, 200)]
+    assert sorted((r.start, r.end) for r in rset.get_region_list(hap=1)) == [(100, 200)]
+
+def test_chop_neither_hap():
+    regions = make_regions("chr1", [(100, 200)])
+    rset = RegionSet(regions, enable_hap_overlap=True)
+    sv_region = Region(chrom="chr1", start=120, end=180)
+    genotype = (False, False)
+    rset.chop(sv_region, genotype)
+    assert sorted((r.start, r.end) for r in rset.get_region_list(hap=0)) == [(100, 200)]
+    assert sorted((r.start, r.end) for r in rset.get_region_list(hap=1)) == [(100, 200)]
 
 
 def test_if_not_none():

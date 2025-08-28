@@ -21,7 +21,6 @@ def test_chop():
     assert len(rs1.chrom2itree['chrB']) == 1
     rs1.chop(Region('chrB', 5, 15))
     assert len(rs1.chrom2itree['chrB']) == 0
-    print('final tree', rs1.chrom2itree)
 
 
 def test_if_not_none():

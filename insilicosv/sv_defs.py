@@ -5,7 +5,6 @@ from copy import copy
 from enum import Enum
 from functools import cached_property
 
-from PIL.ImageOps import scale
 from typing_extensions import TypeAlias, Optional, Any, cast, override
 
 from insilicosv.utils import (

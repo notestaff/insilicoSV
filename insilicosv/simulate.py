@@ -488,6 +488,7 @@ class SVSimulator:
                                                                 overlap_mode, hap_id)
             if valid_region is not None:
                 # A copy of the valid region is returned so we do not change the provided overlap regions (several SVs might overlap it)
+                # [note: if Region is immutable/frozen, is deepcopy needed?]
                 return copy.deepcopy(valid_region), ref_roi.data, roi_index
         return None, None, None
 

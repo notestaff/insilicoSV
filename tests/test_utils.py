@@ -32,7 +32,7 @@ def make_regions(chrom, intervals):
 
 def test_chop_simple_overlap_hap0():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=120, end=180)
     genotype = (True, False)
     rset.chop(sv_region, genotype)
@@ -43,7 +43,7 @@ def test_chop_simple_overlap_hap0():
 
 def test_chop_simple_overlap_hap1():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=120, end=180)
     genotype = (False, True)
     rset.chop(sv_region, genotype)
@@ -54,7 +54,7 @@ def test_chop_simple_overlap_hap1():
 
 def test_chop_simple_overlap_both_haps():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=120, end=180)
     genotype = (True, True)
     rset.chop(sv_region, genotype)
@@ -65,7 +65,7 @@ def test_chop_simple_overlap_both_haps():
 
 def test_chop_no_overlap_any_hap():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=200, end=300)
     genotype = (True, True)
     rset.chop(sv_region, genotype)
@@ -76,7 +76,7 @@ def test_chop_no_overlap_any_hap():
 
 def test_chop_full_overlap_removal_hap0():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=100, end=200)
     genotype = (True, False)
     rset.chop(sv_region, genotype)
@@ -87,7 +87,7 @@ def test_chop_full_overlap_removal_hap0():
 
 def test_chop_partial_left_edge_hap1():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=100, end=150)
     genotype = (False, True)
     rset.chop(sv_region, genotype)
@@ -98,7 +98,7 @@ def test_chop_partial_left_edge_hap1():
 
 def test_chop_partial_right_edge_both_haps():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=150, end=200)
     genotype = (True, True)
     rset.chop(sv_region, genotype)
@@ -109,7 +109,7 @@ def test_chop_partial_right_edge_both_haps():
 
 def test_chop_multiple_regions_hap1():
     regions = make_regions("chr1", [(100, 120), (130, 150), (160, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=135, end=170)
     genotype = (False, True)
     rset.chop(sv_region, genotype)
@@ -119,7 +119,7 @@ def test_chop_multiple_regions_hap1():
 
 def test_chop_other_chrom():
     regions = make_regions("chr2", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=120, end=180)
     genotype = (True, True)
     rset.chop(sv_region, genotype)
@@ -128,7 +128,7 @@ def test_chop_other_chrom():
 
 def test_chop_neither_hap():
     regions = make_regions("chr1", [(100, 200)])
-    rset = RegionSet(regions, enable_hap_overlap=True)
+    rset = RegionSet(regions, allow_hap_overlap=True)
     sv_region = Region(chrom="chr1", start=120, end=180)
     genotype = (False, False)
     rset.chop(sv_region, genotype)

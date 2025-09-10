@@ -165,6 +165,7 @@ class RegionFilter:
     region_length_range: tuple[Optional[int], Optional[int]] = (None, None)
 
     def satisfied_for(self, region) -> bool:
+        # note: should this check region_length_range?
         if (self.region_kinds is not None and
                 (not region.kind or
                  not any((region_kinds.upper() == 'ALL' and region.kind != '_reference_') or

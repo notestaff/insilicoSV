@@ -366,6 +366,13 @@ class SVSimulator:
                                                     end=max_bound)) > self.config.get('th_proportion_N',
                                                                                       DEFAULT_PERCENT_N):
                 return False
+
+            # forbid any overlap with relevant blacklist regions (not just breakends), to cover case of
+            # blacklist region contained inside an SV region
+            bl = self.get_relevant_blacklist_regions(sv.blacklist_filter)
+            if bl is not None and bl.overlaps_region(op_region):
+                return False
+
         return True
 
     # end: def is_placement_valid(...)

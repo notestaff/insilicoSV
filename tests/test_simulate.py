@@ -1022,17 +1022,20 @@ class TestSVSimulator(unittest.TestCase):
                                   ]
         # ------------- test objects for blacklist regions
         self.test_blacklist_regions = [
-            ['TCGATCGATCGAT', TestObject([self.ref_file, {
-                "chr21": "TCGATCGATCGAT"}],
+            [('TCGATCGATCGAT', 'A' * 8), TestObject([self.ref_file, {
+                "chr21": "TCGATCGATCGAT", "chr22": "A" * 8}],
                                          [self.par,
                                           {"reference": self.ref_file,
                                            "random_seed": 3,
                                            "homozygous_only": True,
                                            "blacklist_regions": "tests/inputs/example_avoid_interval_3.bed",
                                            "variant_sets": [{"type": "DEL", "number": 1,
-                                                             "length_ranges": [[6, 6]],
+                                                             "length_ranges": [[2, 2]],
                                                              "blacklist_region_type": "all"}]}],
-                                         self.hap1, self.hap2, self.bed), ['TCTCGAT', 'TCGATCG', 'TCGCGAT']],
+                                         self.hap1, self.hap2, self.bed), [("TCGATCGATCGAT", "A" * 6),
+                                                                           ("TCGATCGCGAT", "A" * 8),
+                                                                           ("TCGATCGATCG", "A" * 8),
+                                                                           ]],
             ['TCGATCGATCGAT', TestObject([self.ref_file, {
                 "chr21": "TCGATCGATCGAT"}],
                                          [self.par,
@@ -1044,7 +1047,7 @@ class TestSVSimulator(unittest.TestCase):
                                                              "length_ranges": [[6, 6]],
                                                              "blacklist_region_type": ['TEST1', 'TEST3']}]}],
                                          self.hap1, self.hap2, self.bed),
-             ['TCTCGAT', 'TCGATCT', 'TCGCGAT', 'TCGATCG', 'TCGATAT', 'GATCGAT']],
+             ['TCTCGAT', 'TCGCGAT']],
             ['TCGATCGATCGAA', TestObject([self.ref_file, {
                 "chr21": "TCGATCGATCGAA"}],
                                          [self.par,
@@ -1055,31 +1058,13 @@ class TestSVSimulator(unittest.TestCase):
                                                                  "tests/inputs/example_avoid_interval_3.bed",
                                                                  "tests/inputs/example_avoid_interval.vcf"],
                                            "variant_sets": [{"type": "A_->A_A", "number": 1,
-                                                             "length_ranges": [[6, 6], [5, 5]],
-                                                             "blacklist_region_type": ['TEST1', 'TEST2', 'TEST3',
-                                                                                       'TEST']},
+                                                             "length_ranges": [[3, 3], [3, 3]],
+                                                             "blacklist_region_type": ['TEST1', 'TESTVCF']},
                                                             {"type": "DEL", "number": 1,
-                                                             "length_ranges": [[3, 3]]}
+                                                             "length_ranges": [[4, 4]]}
                                                             ]}],
-                                         self.hap1, self.hap2, self.bed), ['TCGATCGATAGATCGA']],
-            ['TCGATCGATCGAT', TestObject([self.ref_file, {
-                "chr21": "TCGATCGATCGAT"}],
-                                         [self.par,
-                                          {"reference": self.ref_file,
-                                           "random_seed": 3,
-                                           "homozygous_only": True,
-                                           # can specify same files for blacklist and ROIs
-                                           "overlap_regions": ["tests/inputs/example_avoid_interval_2.bed"],
-                                           "blacklist_regions": ["tests/inputs/example_avoid_interval_2.bed"],
-                                           "variant_sets": [{"type": "DEL", "number": 1,
-                                                             "length_ranges": [[5, 10]],
-                                                             "overlap_mode": "containing",
-                                                             "blacklist_region_type": "all"},
-                                                            ]}],
-                                         self.hap1, self.hap2, self.bed),
-             ['TCGATCGA', 'TCGATCG', 'TCGATC', 'TCGAT', 'TCG', 'TCGA']],
-
-            ['TCGATCGATCGAT', TestObject([self.ref_file, {
+                                         self.hap1, self.hap2, self.bed), ['TCGATCGAGATT']],
+           ['TCGATCGATCGAT', TestObject([self.ref_file, {
                 "chr21": "TCGATCGATCGAT"}],
                                          [self.par,
                                           {"reference": self.ref_file,
@@ -1093,7 +1078,18 @@ class TestSVSimulator(unittest.TestCase):
                                                              "overlap_mode": "partial",
                                                              "blacklist_region_type": "all"},
                                                             ]}],
-                                         self.hap1, self.hap2, self.bed), ['TCGACGAT', 'TCGATGAT', 'CGATCGAT']],
+                                         self.hap1, self.hap2, self.bed), ['CGATCGAT']],
+            [("TCGATCGATCGAT", "A" * 12), TestObject([self.ref_file, {
+                "chr21": "TCGATCGATCGAT", "chr22": "A" * 12}],
+                                         [self.par,
+                                          {"reference": self.ref_file,
+                                           "random_seed": 3,
+                                           "homozygous_only": True,
+                                           "blacklist_regions": "tests/inputs/example_avoid_interval_4.bed",
+                                           "variant_sets": [{"type": "DEL", "number": 1,
+                                                             "length_ranges": [[11, 11]],
+                                                             "blacklist_region_type": "all"}]}],
+                                         self.hap1, self.hap2, self.bed), [("TCGATCGATCGAT", "A")]],
         ]
         # ----------- test objects for unbounded dispersions -----------
         self.test_objects_unbounded_disp = [

@@ -236,6 +236,18 @@ class RegionSet:
                 return True
         return False
 
+    def overlaps_region(self, region):
+        if region.start == region.end:
+            return self.strictly_contains_point(point=region.start, chrom=region.chrom)
+
+        itree = self.chrom2itree[region.chrom][0]
+        overlapping_intervals = itree.overlap(region.start, region.end)
+
+        for interval in overlapping_intervals:
+            if interval.data.start < region.end and interval.data.end > region.start:
+                return True
+        return False
+
     @staticmethod
     def from_beds(bed_paths, to_region_set, verbose=False):
         regions = []
